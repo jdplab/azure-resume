@@ -1,4 +1,4 @@
-name: Blob storage website CI
+name: Cloud Resume Azure Storage Static Website CI
 
 on:
     push:
