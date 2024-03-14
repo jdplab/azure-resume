@@ -45,12 +45,25 @@ function clearToken() {
     sessionStorage.removeItem('tokenClaims');
 }
 
+function generateNonce(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+// Function to handle login
 // Function to handle login
 function login() {
+    var nonce = generateNonce(32);
+    sessionStorage.setItem('nonce', nonce);
     // Store the current page URL before redirecting
     storeCurrentPageURL();
     // Redirect user to Azure AD B2C for authentication
-    window.location.href = 'https://resumedev.b2clogin.com/resumedev.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_SignUpSignIn&client_id=eb4669a7-4113-460f-9e84-2b409eac8af0&nonce=defaultNonce&redirect_uri=https%3A%2F%2Fresume.jon-polansky.com%2F.auth%2Flogin%2Faadb2c%2Fcallback&scope=openid&response_type=id_token%20token&prompt=login&state=' + encodeURIComponent(window.location.href);
+    window.location.href = 'https://resumedev.b2clogin.com/resumedev.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_SignUpSignIn&client_id=eb4669a7-4113-460f-9e84-2b409eac8af0&nonce=' + nonce + '&redirect_uri=https%3A%2F%2Fresume.jon-polansky.com%2F.auth%2Flogin%2Faadb2c%2Fcallback&scope=openid&response_type=id_token&prompt=login&state=' + encodeURIComponent(window.location.href);
 }
 
 // Function to handle logout
@@ -75,9 +88,18 @@ function handleAuthenticationCallback() {
 
         // If an ID token is present, parse its claims and store them
         if (idToken) {
-            sessionStorage.setItem('id_token', idToken);
             const tokenClaims = parseJwt(idToken);
             if (tokenClaims) {
+                // Retrieve the nonce from session storage
+                const storedNonce = sessionStorage.getItem('nonce');
+                if (tokenClaims.nonce !== storedNonce) {
+                    // Nonce does not match, handle error
+                    console.error('Nonce mismatch error');
+                    alert('Authentication failed. Please try again.');
+                    window.location.href = '/';
+                    return;
+                }
+                sessionStorage.setItem('id_token', idToken);
                 sessionStorage.setItem('tokenClaims', JSON.stringify(tokenClaims));
             }
         }
