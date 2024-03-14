@@ -8,11 +8,13 @@
 <body>
     <h1>Authentication Callback</h1>
     <p>This is the callback page for authentication.</p>
-    <script>
-        handleAuthenticationCallback();
-    </script>
 
     <script src="js/auth.js"></script>
+    <script>
+        window.onload = function() {
+            handleAuthenticationCallback();
+        };
+    </script>
 
 </body>
 </html>
