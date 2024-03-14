@@ -1,5 +1,6 @@
 // Function to parse JWT token
 function parseJwt(token) {
+    console.log('Parsing JWT token:', token);
     try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -19,27 +20,32 @@ function storeCurrentPageURL() {
 
 // Function to retrieve token from sessionStorage
 function getToken() {
+    console.log('Retrieving token from sessionStorage');
     const accessToken = sessionStorage.getItem('access_token');
     if (!accessToken) {
+        console.log('No access token found in sessionStorage');
         return null;
     }
     const tokenClaims = parseJwt(accessToken);
     if (tokenClaims.exp * 1000 < Date.now()) {
-        // Access token is expired, redirect to login
+        console.log('Access token is expired, redirecting to login');
         login();
         return null;
     } else {
+        console.log('Returning access token:', accessToken);
         return accessToken;
     }
 }
 
 // Function to store token in sessionStorage
 function storeToken(token) {
+    console.log('Storing token in sessionStorage:', token);
     sessionStorage.setItem('access_token', token);
 }
 
 // Function to clear token from sessionStorage
 function clearToken() {
+    console.log('Clearing token from sessionStorage');
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('id_token');
     sessionStorage.removeItem('tokenClaims');
@@ -56,8 +62,13 @@ function generateNonce(length) {
 }
 
 // Function to handle login
-// Function to handle login
 function login() {
+    console.log('Handling login');
+    const existingToken = getToken();
+    if (existingToken) {
+        console.log('Valid token already exists, skipping authentication');
+        return;
+    }
     var nonce = generateNonce(32);
     sessionStorage.setItem('nonce', nonce);
     // Store the current page URL before redirecting
@@ -75,6 +86,7 @@ function logout() {
 
 // Function to handle the authentication callback
 function handleAuthenticationCallback() {
+    console.log('Handling authentication callback');
     // Parse fragment parameters from URL
     const urlParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = urlParams.get('access_token');
@@ -83,11 +95,12 @@ function handleAuthenticationCallback() {
     const redirectFrom = urlParams.get('state');
 
     if (accessToken) {
-        // Authentication successful, store the access token securely (e.g., in session storage)
+        console.log('Authentication successful, storing access token:', accessToken);
         sessionStorage.setItem('access_token', accessToken);
 
         // If an ID token is present, parse its claims and store them
         if (idToken) {
+            console.log('ID token found, parsing claims and storing:', idToken);
             const tokenClaims = parseJwt(idToken);
             if (tokenClaims) {
                 // Retrieve the nonce from session storage
@@ -121,6 +134,7 @@ function handleAuthenticationCallback() {
 }
 
 function displayTokenClaims() {
+    console.log('Displaying token claims');
     // Get ID token from sessionStorage
     const idToken = sessionStorage.getItem('id_token');
     if (idToken) {
