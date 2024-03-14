@@ -101,29 +101,30 @@ function handleAuthenticationCallback() {
     if (accessToken) {
         console.log('Authentication successful, storing access token:', accessToken);
         sessionStorage.setItem('access_token', accessToken);
+    }
 
-        // If an ID token is present, parse its claims and store them
-        if (idToken) {
-            console.log('ID token found, parsing claims and storing:', idToken);
-            const tokenClaims = parseJwt(idToken);
-            if (tokenClaims) {
-                // Retrieve the nonce from session storage
-                const storedNonce = sessionStorage.getItem('nonce');
-                if (tokenClaims.nonce !== storedNonce) {
-                    // Nonce does not match, handle error
-                    console.error('Nonce mismatch error');
-                    alert('Authentication failed. Please try again.');
-                    window.location.href = '/';
-                    return;
-                }
-                sessionStorage.setItem('id_token', idToken);
-                sessionStorage.setItem('tokenClaims', JSON.stringify(tokenClaims));
+    // If an ID token is present, parse its claims and store them
+    if (idToken) {
+        console.log('ID token found, parsing claims and storing:', idToken);
+        const tokenClaims = parseJwt(idToken);
+        if (tokenClaims) {
+            // Retrieve the nonce from session storage
+            const storedNonce = sessionStorage.getItem('nonce');
+            if (tokenClaims.nonce !== storedNonce) {
+                // Nonce does not match, handle error
+                console.error('Nonce mismatch error');
+                alert('Authentication failed. Please try again.');
+                window.location.href = '/';
+                return;
             }
+            sessionStorage.setItem('id_token', idToken);
+            sessionStorage.setItem('tokenClaims', JSON.stringify(tokenClaims));
         }
+    }
 
-        // Redirect user back to the original page or perform additional actions
-        window.location.href = decodeURIComponent(redirectFrom) || '/';
-    } else if (error) {
+    // Redirect user back to the original page or perform additional actions
+    window.location.href = decodeURIComponent(redirectFrom) || '/';
+    if (error) {
         // Authentication failed, handle the error (e.g., display error message)
         console.error('Authentication error:', error);
         alert('Authentication failed. Please try again.');
