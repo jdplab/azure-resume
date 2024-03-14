@@ -130,10 +130,6 @@ function displayTokenClaims() {
             if (emailAddressesElement) {
                 emailAddressesElement.innerText = (tokenClaims.emails && tokenClaims.emails.join(', ')) || 'No Data';
             }
-            const givenNameElement = document.getElementById('givenName');
-            if (givenNameElement) {
-                givenNameElement.innerText = tokenClaims.given_name || 'No Data';
-            }
             const elevatedElement = document.getElementById('elevated');
             if (elevatedElement) {
                 elevatedElement.innerText = tokenClaims.extension_Elevated || 'No Data';
@@ -154,13 +150,13 @@ window.onload = function() {
     if (token) {
         // Retrieve the tokenClaims from session storage
         const tokenClaims = JSON.parse(sessionStorage.getItem('tokenClaims'));
-
+        displayTokenClaims();
         // Check if tokenClaims is not null
         if (tokenClaims) {
             // Update the HTML elements with the values from tokenClaims
+            console.log('TokenClaims found. Displaying token claims.');
             document.getElementById('displayName').textContent = tokenClaims.name || 'No Data';
             document.getElementById('emailAddresses').textContent = (tokenClaims.emails && tokenClaims.emails.join(', ')) || 'No Data';
-            document.getElementById('givenName').textContent = tokenClaims.given_name || 'No Data';
             document.getElementById('elevated').textContent = tokenClaims.elevated || 'No Data';
         }
     }
