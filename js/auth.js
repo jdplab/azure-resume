@@ -87,9 +87,11 @@ function logout() {
 // Function to handle the authentication callback
 function handleAuthenticationCallback() {
     console.log('Handling authentication callback');
+    // Remove the '#' character from the start of the URL fragment
+    const fragment = window.location.hash.substring(1);
     // Parse fragment parameters from URL
-    const urlParams = new URLSearchParams(window.location.hash.substring(1));
-    console.log('URL fragment:', window.location.hash);
+    const urlParams = new URLSearchParams(fragment);
+    console.log('URL fragment:', fragment);
     console.log('Parsed parameters:', Array.from(urlParams.entries()));
     const accessToken = urlParams.get('access_token');
     const idToken = urlParams.get('id_token');
