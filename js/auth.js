@@ -89,6 +89,8 @@ function handleAuthenticationCallback() {
     console.log('Handling authentication callback');
     // Parse fragment parameters from URL
     const urlParams = new URLSearchParams(window.location.hash.substring(1));
+    console.log('URL fragment:', window.location.hash);
+    console.log('Parsed parameters:', Array.from(urlParams.entries()));
     const accessToken = urlParams.get('access_token');
     const idToken = urlParams.get('id_token');
     const error = urlParams.get('error');
