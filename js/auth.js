@@ -142,7 +142,7 @@ function displayTokenClaims() {
     }
 }
 
-window.onload = function() {
+window.addEventListener('load', function() {
     // Retrieve the token from session storage
     const token = sessionStorage.getItem('id_token');
 
@@ -150,7 +150,6 @@ window.onload = function() {
     if (token) {
         // Retrieve the tokenClaims from session storage
         const tokenClaims = JSON.parse(sessionStorage.getItem('tokenClaims'));
-        displayTokenClaims();
         // Check if tokenClaims is not null
         if (tokenClaims) {
             // Update the HTML elements with the values from tokenClaims
@@ -160,4 +159,4 @@ window.onload = function() {
             document.getElementById('elevated').textContent = tokenClaims.elevated || 'No Data';
         }
     }
-}
+});
