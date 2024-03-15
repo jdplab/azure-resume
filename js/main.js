@@ -1,5 +1,11 @@
 window.addEventListener('DOMContentLoaded', (event) => {
-    getVisitCount();
+    getVisitCount()
+    .then(count => {
+        console.log('Visit count:', count);
+    })
+    .catch(error => {
+        console.log('Error getting visit count:', error);
+    });
 });
 
 
@@ -7,19 +13,55 @@ const localApi = 'http://localhost:7071/api/GetResumeCounter';
 const functionApi = 'https://resumefunctiondev.azurewebsites.net/api/visitorCount?code=IZINpOE11SBFNU0dgFgThyZqfEKssSA2HGdT31-jo3wzAzFuxjfK5g==';
 
 const getVisitCount = () => {
-    let count = 30;
-    fetch(functionApi)
-    .then(response => {
-        return response.json()
-    })
-    .then(response => {
-        console.log("Website called function API.");
-        count = response;
-        document.getElementById('counter').innerText = count;
-    }).catch(function(error) {
-        console.log(error);
-      });
-    return count;
+    return new Promise((resolve, reject) => {
+        let count = 30;
+        let repeatVisit = 0;
+
+        // Check if local storage is available
+        if (typeof(Storage) !== "undefined") {
+            let lastVisit = localStorage.getItem('lastVisit');
+            let now = Date.now();
+
+            // If the user has not visited in the last 5 minutes
+            if (!lastVisit || now - lastVisit > 5 * 60 * 1000) {
+                repeatVisit = 0;
+                // Try to update the last visit time
+                try {
+                    localStorage.setItem('lastVisit', now);
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        console.log('Local storage quota exceeded');
+                    } else {
+                        console.log('Cannot access local storage');
+                    }
+                }
+            } else {
+                repeatVisit = 1;
+            }
+
+            // Fetch the visit count from the server
+            fetch(`${functionApi}&repeatVisit=${repeatVisit}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(response => {
+                console.log("Website called function API.");
+                count = response;
+                document.getElementById('counter').innerText = count;
+                resolve(count);
+            })
+            .catch(function(error) {
+                console.log('There has been a problem with your fetch operation: ', error);
+                reject(error);
+            });
+        } else {
+            console.log('Local storage is not supported by this browser');
+            reject(new Error('Local storage is not supported by this browser'));
+        }
+    });
 };
 
  AOS.init({

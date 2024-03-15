@@ -1,0 +1,35 @@
+{
+    "bindings": [
+      {
+        "authLevel": "function",
+        "type": "httpTrigger",
+        "direction": "in",
+        "name": "req",
+        "methods": [
+          "get",
+          "post"
+        ]
+      },
+      {
+        "type": "http",
+        "direction": "out",
+        "name": "res"
+      },
+      {
+        "name": "inputDocument",
+        "direction": "in",
+        "type": "cosmosDB",
+        "connectionStringSetting": "resumedevdb1_DOCUMENTDB",
+        "databaseName": "ToDoList",
+        "collectionName": "Items"
+      },
+      {
+        "name": "outputDocument",
+        "direction": "out",
+        "type": "cosmosDB",
+        "connectionStringSetting": "resumedevdb1_DOCUMENTDB",
+        "databaseName": "ToDoList",
+        "collectionName": "Items"
+      }
+    ]
+  }
