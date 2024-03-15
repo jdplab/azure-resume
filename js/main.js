@@ -1,7 +1,6 @@
 window.addEventListener('DOMContentLoaded', (event) => {
     getVisitCount()
     .then(count => {
-        console.log('Visit count:', count);
     })
     .catch(error => {
         console.log('Error getting visit count:', error);
@@ -22,8 +21,8 @@ const getVisitCount = () => {
             let lastVisit = localStorage.getItem('lastVisit');
             let now = Date.now();
 
-            // If the user has not visited in the last 5 minutes
-            if (!lastVisit || now - lastVisit > 5 * 60 * 1000) {
+            // If the user has not visited in the last 15 minutes
+            if (!lastVisit || now - lastVisit > 15 * 60 * 1000) {
                 repeatVisit = 0;
                 // Try to update the last visit time
                 try {
@@ -38,29 +37,28 @@ const getVisitCount = () => {
             } else {
                 repeatVisit = 1;
             }
-
-            // Fetch the visit count from the server
-            fetch(`${functionApi}&repeatVisit=${repeatVisit}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(response => {
-                console.log("Website called function API.");
-                count = response;
-                document.getElementById('counter').innerText = count;
-                resolve(count);
-            })
-            .catch(function(error) {
-                console.log('There has been a problem with your fetch operation: ', error);
-                reject(error);
-            });
         } else {
             console.log('Local storage is not supported by this browser');
-            reject(new Error('Local storage is not supported by this browser'));
+            repeatVisit = 0; // Treat every visit as a new visit
         }
+
+        // Fetch the visit count from the server
+        fetch(`${functionApi}&repeatVisit=${repeatVisit}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(response => {
+            count = response;
+            document.getElementById('counter').innerText = count;
+            resolve(count);
+        })
+        .catch(function(error) {
+            console.log('There has been a problem with your fetch operation: ', error);
+            reject(error);
+        });
     });
 };
 
